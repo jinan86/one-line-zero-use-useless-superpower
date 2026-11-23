@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """One Line, Zero Use: The Useless Superpower Sprint (make.fun entry).
 
-Writes a single line describing a useless superpower to /output/entry.txt.
-Deterministic, no network, Python 3.13.
+Writes exactly one line describing a useless superpower to
+/output/entry.txt. Deterministic, no network, Python 3.13.
 """
 
-import os
+from pathlib import Path
+
+OUTPUT_PATH = Path("/output/entry.txt")
 
 ENTRY = (
     "I can read my plants' minds, but only while I'm asleep, "
@@ -14,9 +16,11 @@ ENTRY = (
 
 
 def main() -> None:
-    os.makedirs("/output", exist_ok=True)
-    with open("/output/entry.txt", "w", encoding="utf-8") as f:
-        f.write(ENTRY + "\n")
+    # Guard the contract: exactly one line, exactly 128 characters.
+    if "\n" in ENTRY or len(ENTRY) != 128:
+        raise ValueError("ENTRY must be a single line of 128 characters")
+    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    OUTPUT_PATH.write_text(ENTRY + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":
